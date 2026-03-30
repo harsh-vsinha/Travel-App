@@ -22,16 +22,13 @@
         <a href="#">About Us</a>
         <a href="#">Contact</a>
       </div>
-      <button class="btn-primary">Book Now</button>
+      <button class="btn-primary" onclick="toggleCart()">Book Now</button>
     </nav>
 
     <header class="hero">
       <div class="hero-content">
         <h2>Explore the Colors of India</h2>
-        <p>
-          From bustling metros to serene spiritual retreats, find your next
-          adventure.
-        </p>
+        <p>From bustling metros to serene spiritual retreats.</p>
       </div>
     </header>
 
@@ -39,74 +36,67 @@
       <section class="destination-section">
         <div class="section-header">
           <h3>Metropolitan & Heritage</h3>
-          <p>
-            Experience the fast-paced life and deep-rooted history of India's
-            iconic cities.
-          </p>
         </div>
 
         <div class="card-grid">
           <div class="city-card">
-            <img src="Mumbai.jpg" alt="Mumbai - Gateway of India" />
+            <img src="asset/Mumbai.jpg" alt="Mumbai" />
             <div class="card-body">
               <h4>Mumbai</h4>
               <p class="state">Maharashtra</p>
-              <p class="desc">
-                The City of Dreams, home to Bollywood and the iconic Gateway of
-                India.
-              </p>
-              <a href="#" class="explore-link"
-                >Explore
-                <span class="material-icons-outlined">arrow_forward</span></a
+              <p class="desc">The City of Dreams and Bollywood.</p>
+              <a
+                class="explore-link"
+                onclick="addToCart('Mumbai', 'Maharashtra', '₹15,000')"
               >
+                Book Trip
+                <span class="material-icons-outlined">add_shopping_cart</span>
+              </a>
             </div>
           </div>
-
           <div class="city-card">
-            <img src="Delhi1.jpg" alt="New Delhi - India Gate" />
+            <img src="asset/Delhi1.jpg" alt="Delhi" />
             <div class="card-body">
               <h4>New Delhi</h4>
               <p class="state">Delhi NCR</p>
-              <p class="desc">
-                The historic capital, blending Mughal architecture with modern
-                infrastructure.
-              </p>
-              <a href="#" class="explore-link"
-                >Explore
-                <span class="material-icons-outlined">arrow_forward</span></a
+              <p class="desc">Historic capital with Mughal architecture.</p>
+              <a
+                class="explore-link"
+                onclick="addToCart('New Delhi', 'Delhi NCR', '₹12,000')"
               >
+                Book Trip
+                <span class="material-icons-outlined">add_shopping_cart</span>
+              </a>
             </div>
           </div>
-
           <div class="city-card">
-            <img src="Bengaluru.jpg" alt="Bengaluru - Mysore Palace" />
+            <img src="asset/Bengaluru.jpg" alt="Bengaluru" />
             <div class="card-body">
               <h4>Bengaluru</h4>
               <p class="state">Karnataka</p>
-              <p class="desc">
-                The Garden City and gateway to South India's royal history and
-                technology hubs.
-              </p>
-              <a href="#" class="explore-link"
-                >Explore
-                <span class="material-icons-outlined">arrow_forward</span></a
+              <p class="desc">The Garden City and tech hub.</p>
+              <a
+                class="explore-link"
+                onclick="addToCart('Bengaluru', 'Karnataka', '₹14,000')"
               >
+                Book Trip
+                <span class="material-icons-outlined">add_shopping_cart</span>
+              </a>
             </div>
           </div>
-
           <div class="city-card">
-            <img src="varanasi.jpg" alt="Varanasi - Ganga Ghats" />
+            <img src="asset/varanasi.jpg" alt="Varanasi" />
             <div class="card-body">
               <h4>Varanasi</h4>
               <p class="state">Uttar Pradesh</p>
-              <p class="desc">
-                The spiritual capital of India, known for its sacred ghats and
-                captivating Ganga Aarti.
-              </p>
-              <a href="#" class="explore-link"
-                >Explore
-                <span class="material-icons-outlined">arrow_forward</span></a
+              <p class="desc">Spiritual capital on the Ganga.</p>
+              <a
+                class="explore-link"
+                onclick="addToCart('Varanasi', 'Uttar Pradesh', '₹10,000')"
               >
+                Book Trip
+                <span class="material-icons-outlined">add_shopping_cart</span>
+              </a>
             </div>
           </div>
         </div>
@@ -115,79 +105,95 @@
       <section class="destination-section bg-light">
         <div class="section-header">
           <h3>Scenic & Spiritual Escapes</h3>
-          <p>
-            Find peace in the mountains, relax by the sea, or seek divine
-            blessings.
-          </p>
         </div>
-
         <div class="card-grid">
           <div class="city-card">
-            <img src="Rishikesh1.webp" alt="Rishikesh - River Ganga" />
+            <img src="asset/Rishikesh1.webp" alt="Rishikesh" />
             <div class="card-body">
               <h4>Rishikesh</h4>
               <p class="state">Uttarakhand</p>
-              <p class="desc">
-                The Yoga Capital of the World, nestled in the Himalayan
-                foothills with iconic suspension bridges.
-              </p>
-              <a href="#" class="explore-link"
-                >Explore
-                <span class="material-icons-outlined">arrow_forward</span></a
+              <p class="desc">The Yoga Capital of the World.</p>
+              <a
+                class="explore-link"
+                onclick="addToCart('Rishikesh', 'Uttarakhand', '₹8,000')"
               >
+                Book Trip
+                <span class="material-icons-outlined">add_shopping_cart</span>
+              </a>
             </div>
           </div>
-
           <div class="city-card">
-            <img src="Manali.jpg" alt="Manali - Snowy Mountains" />
+            <img src="asset/Manali.jpg" alt="Manali" />
             <div class="card-body">
               <h4>Manali</h4>
               <p class="state">Himachal Pradesh</p>
-              <p class="desc">
-                Nestled in the Himalayas, Manali offers breathtaking snow-capped
-                mountain vistas and adventures.
-              </p>
-              <a href="#" class="explore-link"
-                >Explore
-                <span class="material-icons-outlined">arrow_forward</span></a
+              <p class="desc">Snow-capped mountains and adventure.</p>
+              <a
+                class="explore-link"
+                onclick="addToCart('Manali', 'Himachal', '₹11,000')"
               >
+                Book Trip
+                <span class="material-icons-outlined">add_shopping_cart</span>
+              </a>
             </div>
           </div>
-
           <div class="city-card">
-            <img src="Puri.jpg" alt="Puri - Temple" />
+            <img src="asset/Puri.jpg" alt="Puri" />
             <div class="card-body">
               <h4>Puri</h4>
               <p class="state">Odisha</p>
-              <p class="desc">
-                A beautiful coastal city famous for the sacred Shri Jagannath
-                Temple and the Golden Beach.
-              </p>
-              <a href="#" class="explore-link"
-                >Explore
-                <span class="material-icons-outlined">arrow_forward</span></a
+              <p class="desc">Jagannath Temple and Golden Beach.</p>
+              <a
+                class="explore-link"
+                onclick="addToCart('Puri', 'Odisha', '₹9,000')"
               >
+                Book Trip
+                <span class="material-icons-outlined">add_shopping_cart</span>
+              </a>
             </div>
           </div>
-
           <div class="city-card">
-            <img src="tirupati.jpg" alt="Tirupati - Temple Architecture" />
+            <img src="asset/tirupati.jpg" alt="Tirupati" />
             <div class="card-body">
               <h4>Tirupati</h4>
               <p class="state">Andhra Pradesh</p>
-              <p class="desc">
-                Home to the revered Sri Venkateswara Temple, a major pilgrimage
-                center of profound peace.
-              </p>
-              <a href="#" class="explore-link"
-                >Explore
-                <span class="material-icons-outlined">arrow_forward</span></a
+              <p class="desc">Home to the revered Venkateswara Temple.</p>
+              <a
+                class="explore-link"
+                onclick="addToCart('Tirupati', 'Andhra', '₹7,000')"
               >
+                Book Trip
+                <span class="material-icons-outlined">add_shopping_cart</span>
+              </a>
             </div>
           </div>
         </div>
       </section>
     </main>
+
+    <div id="cart-sidebar" class="cart-sidebar">
+      <div class="cart-header">
+        <h3>Your Bookings</h3>
+        <span class="material-icons-outlined close-cart" onclick="toggleCart()"
+          >close</span
+        >
+      </div>
+      <div id="cart-items" class="cart-items"></div>
+      <div class="cart-footer">
+        <div class="total">
+          <span>Total:</span>
+          <span id="cart-total">₹0</span>
+        </div>
+        <button class="btn-primary full-width" onclick="checkout()">
+          Proceed to Checkout
+        </button>
+      </div>
+    </div>
+
+    <div class="floating-cart" onclick="toggleCart()">
+      <span class="material-icons-outlined">shopping_cart</span>
+      <span id="cart-count" class="cart-count">0</span>
+    </div>
 
     <footer class="site-footer">
       <div class="footer-content">
@@ -195,9 +201,10 @@
         <div class="socials">
           <a href="#">Instagram</a>
           <a href="#">Facebook</a>
-          <a href="#">Twitter</a>
         </div>
       </div>
     </footer>
+
+    <script src="script.js"></script>
   </body>
 </html>
