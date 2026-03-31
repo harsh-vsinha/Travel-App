@@ -1,0 +1,81 @@
+{
+  "packages": [
+    {
+      "id": 1,
+      "name": "Mumbai",
+      "state": "Maharashtra",
+      "price": "₹15,000",
+      "image": "asset/Mumbai.jpg",
+      "desc": "The City of Dreams and Bollywood."
+    },
+    {
+      "id": 2,
+      "name": "New Delhi",
+      "state": "Delhi NCR",
+      "price": "₹12,000",
+      "image": "asset/Delhi1.jpg",
+      "desc": "Historic capital with Mughal architecture."
+    },
+    {
+      "id": 3,
+      "name": "Bengaluru",
+      "state": "Karnataka",
+      "price": "₹14,000",
+      "image": "asset/Bengaluru.jpg",
+      "desc": "The Garden City and tech hub."
+    },
+    {
+      "id": 4,
+      "name": "Varanasi",
+      "state": "Uttar Pradesh",
+      "price": "₹10,000",
+      "image": "asset/varanasi.jpg",
+      "desc": "Spiritual capital on the Ganga."
+    },
+    {
+      "id": 5,
+      "name": "Rishikesh",
+      "state": "Uttarakhand",
+      "price": "₹8,000",
+      "image": "asset/Rishikesh1.webp",
+      "desc": "The Yoga Capital of the World."
+    },
+    {
+      "id": 6,
+      "name": "Manali",
+      "state": "Himachal Pradesh",
+      "price": "₹11,000",
+      "image": "asset/Manali.jpg",
+      "desc": "Snow-capped mountains and adventure."
+    },
+    {
+      "id": 7,
+      "name": "Puri",
+      "state": "Odisha",
+      "price": "₹9,000",
+      "image": "asset/Puri.jpg",
+      "desc": "Jagannath Temple and Golden Beach."
+    },
+    {
+      "id": 8,
+      "name": "Tirupati",
+      "state": "Andhra Pradesh",
+      "price": "₹7,000",
+      "image": "asset/tirupati.jpg",
+      "desc": "Home to the revered Venkateswara Temple."
+    }
+  ],
+  "cart": [
+    {
+      "id": 1,
+      "items": []
+    }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "username": "Admin Traveler",
+      "password": "12345678"
+    }
+  ]
+}
