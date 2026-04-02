@@ -275,6 +275,10 @@
      flex-direction: column;
  }
 
+ .cart-sidebar.active {
+     right: 0;
+ }
+
  .cart-sidebar.open {
      right: 0;
  }
@@ -365,4 +369,67 @@
      .card-grid {
          grid-template-columns: 1fr;
      }
+ }
+
+ .btn-icon {
+     background: none;
+     border: none;
+     color: var(--secondary-color);
+     cursor: pointer;
+     position: relative;
+     display: flex;
+     align-items: center;
+     padding: 0.5rem;
+     transition: transform 0.3s;
+ }
+
+ .btn-icon:hover {
+     transform: scale(1.1);
+ }
+
+ .nav-badge {
+     top: 0;
+     right: 0;
+     width: 20px;
+     height: 20px;
+     font-size: 0.7rem;
+     background-color: #e84d4d;
+ }
+
+ .wishlist-btn {
+     position: absolute;
+     top: 10px;
+     right: 10px;
+     background: white;
+     border-radius: 50%;
+     width: 35px;
+     height: 35px;
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     cursor: pointer;
+     box-shadow: var(--shadow);
+     transition: all 0.3s;
+     z-index: 10;
+ }
+
+ .wishlist-btn:hover {
+     transform: scale(1.1);
+ }
+
+ .wishlist-btn .material-icons-outlined {
+     color: #ccc;
+     transition: color 0.3s;
+ }
+
+ /* Active state for the heart */
+ .wishlist-btn.active .material-icons-outlined {
+     color: #e9431e;
+     font-variation-settings: 'FILL' 1;
+     /* Fills the icon if font supports it */
+ }
+
+ /* Position relative for cards to contain the absolute heart */
+ .city-card {
+     position: relative;
  }

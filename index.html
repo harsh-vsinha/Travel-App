@@ -24,6 +24,14 @@
       </div>
       <button class="btn-primary" onclick="Login()">Login / Register</button>
       <button class="btn-primary" onclick="toggleCart()">Book Now</button>
+      <button
+        class="btn-icon"
+        onclick="toggleWishlistSidebar()"
+        title="Wishlist"
+      >
+        <span class="material-icons-outlined">favorite_border</span>
+        <span id="wishlist-count" class="cart-count nav-badge">0</span>
+      </button>
     </nav>
 
     <header class="hero">
@@ -171,6 +179,18 @@
       </section>
     </main>
 
+    <div id="wishlist-sidebar" class="cart-sidebar">
+      <div class="cart-header" style="background-color: #ed0707">
+        <h3>Your Wishlist</h3>
+        <span
+          class="material-icons-outlined close-cart"
+          onclick="toggleWishlistSidebar()"
+          >close</span
+        >
+      </div>
+      <div id="wishlist-items" class="cart-items"></div>
+    </div>
+
     <div id="cart-sidebar" class="cart-sidebar">
       <div class="cart-header">
         <h3>Your Bookings</h3>
@@ -206,6 +226,7 @@
       </div>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/@reduxjs/toolkit@2/dist/redux-toolkit.umd.min.js"></script>
     <script src="script.js"></script>
   </body>
 </html>

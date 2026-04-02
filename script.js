@@ -1,178 +1,360 @@
-let cart = JSON.parse(localStorage.getItem("darshan_cart")) || [];
 const API_URL = "http://localhost:3000";
+import store from "./slice/cartSlice.js"; // <-- Adjust this path to where your store is created
+import { addItem } from "./cartSlice.js";
 
-// Fetch Packages
-async function fetchPackages() {
+// ==========================================
+// 1. REDUX TOOLKIT SETUP
+// ==========================================
+if (!window.RTK) {
+  console.error("Redux Toolkit CDN is missing in index.html!");
+}
+
+const { configureStore, createSlice } = window.RTK;
+
+const loadState = (key, fallback) => {
   try {
-    const response = await fetch(`${API_URL}/packages`);
-    if (!response.ok) throw new Error("API not responding");
-    const packages = await response.json();
-
-    renderPackages(packages);
-  } catch (error) {
-    console.log("Backend not connected. Using static HTML from index.html");
+    const serializedState = localStorage.getItem(key);
+    return serializedState ? JSON.parse(serializedState) : fallback;
+  } catch (err) {
+    return fallback;
   }
-}
+};
 
-function renderPackages(packages) {
-  const grid1 = document.getElementById("grid-1");
-  const grid2 = document.getElementById("grid-2");
+const wishlistSlice = createSlice({
+  name: "wishlist",
+  initialState: loadState("darshan_wishlist", []),
+  reducers: {
+    toggleItem: (state, action) => {
+      const existingIndex = state.findIndex(
+        (item) => item.name === action.payload.name,
+      );
+      if (existingIndex >= 0) {
+        state.splice(existingIndex, 1);
+      } else {
+        state.push(action.payload);
+      }
+    },
+  },
+});
 
-  if (!grid1 || !grid2) return;
+// ==========================================
+// 2. PERSISTENCE & SUBSCRIPTION
+// ==========================================
+store.subscribe(() => {
+  const state = store.getState();
 
-  const section1Data = packages.slice(0, 4);
-  const section2Data = packages.slice(4, 8);
+  localStorage.setItem("darshan_cart", JSON.stringify(state.cart));
+  localStorage.setItem("darshan_wishlist", JSON.stringify(state.wishlist));
+  localStorage.setItem("darshan_auth", JSON.stringify(state.auth));
 
-  const createCard = (pkg) => `
-    <div class="city-card">
-      <img src="${pkg.image}" alt="${pkg.name}" onerror="this.src='https://via.placeholder.com/300x200?text=${pkg.name}'">
-      <div class="card-body">
-        <h4>${pkg.name}</h4>
-        <p class="state">${pkg.state}</p>
-        <p class="desc">${pkg.desc}</p>
-        <a class="explore-link" onclick="addToCart('${pkg.name}', '${pkg.state}', '${pkg.price}')">
-          Book Trip <span class="material-icons-outlined">add_shopping_cart</span>
-        </a>
-      </div>
-    </div>
-  `;
-
-  grid1.innerHTML = section1Data.map(createCard).join("");
-  grid2.innerHTML = section2Data.map(createCard).join("");
-}
-
-// Backend Sync
-async function syncWithBackend() {
-  try {
-    await fetch(`${API_URL}/cart/1`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: 1, items: cart }),
-    });
-    console.log("Backend Synced!");
-  } catch (error) {
-    console.error("Backend sync failed:", error);
-  }
-}
-
-// Cart Functions
-function toggleCart() {
-  document.getElementById("cart-sidebar").classList.toggle("open");
-}
-
-function addToCart(name, state, price) {
-  const bookingDate = new Date().toLocaleDateString("en-IN");
-  const itemPrice = parseInt(String(price).replace(/[₹,]/g, ""));
-
-  cart.push({ name, state, price: itemPrice, date: bookingDate });
-  saveAndRefresh();
-
-  if (!document.getElementById("cart-sidebar").classList.contains("open")) {
-    toggleCart();
-  }
-}
-
-function removeFromCart(index) {
-  cart.splice(index, 1);
-  saveAndRefresh();
-}
-
-function saveAndRefresh() {
-  localStorage.setItem("darshan_cart", JSON.stringify(cart));
   updateCartUI();
-  syncWithBackend();
-}
+  updateWishlistUI();
+  updateAuthUI();
 
-function updateCartUI() {
-  const cartItems = document.getElementById("cart-items");
-  const cartCount = document.getElementById("cart-count");
-  const cartTotal = document.getElementById("cart-total");
+  renderPackages(window.currentPackages || []);
+});
 
-  cartCount.innerText = cart.length;
-
-  if (cart.length === 0) {
-    cartItems.innerHTML =
-      '<p class="empty-msg" style="text-align:center; padding:20px;">No destinations added yet.</p>';
-    cartTotal.innerText = "₹0";
-    return;
-  }
-
-  let total = 0;
-  cartItems.innerHTML = cart
-    .map((item, index) => {
-      total += item.price;
-      return `
-      <div class="cart-item" style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #eee;">
-        <div>
-          <p style="font-weight:bold; margin:0;">${item.name}</p>
-          <p style="font-size:12px; color:#666; margin:0;">${item.state} | ${item.date}</p>
-          <p style="color:#ff4d00; font-weight:bold; margin:0;">₹${item.price.toLocaleString("en-IN")}</p>
-        </div>
-        <span class="material-icons-outlined" style="cursor:pointer; color:red;" onclick="removeFromCart(${index})">delete</span>
-      </div>
-    `;
-    })
-    .join("");
-
-  cartTotal.innerText = "₹" + total.toLocaleString("en-IN");
-}
-
-// Auth Functions
+// ==========================================
+// 3. AUTHENTICATION UI
+// ==========================================
 function Login() {
-  const user = prompt("Username:");
-  const pass = prompt("Password:");
+  // Added .trim() to make the prompt more forgiving of accidental spaces
+  const user = prompt("Username:")?.trim();
+  const pass = prompt("Password:")?.trim();
+
   if (user === "Admin Traveler" && pass === "12345678") {
-    localStorage.setItem("isLoggedIn", "true");
+    store.dispatch(
+      authSlice.actions.login({ username: "Admin Traveler", role: "admin" }),
+    );
     alert("Login Successful!");
-    checkAuthStatus();
   } else {
     alert("Invalid Credentials.");
   }
 }
 
 function Logout() {
-  localStorage.removeItem("isLoggedIn");
+  store.dispatch(authSlice.actions.logout());
   alert("Logged out successfully.");
-  checkAuthStatus();
 }
 
-function checkAuthStatus() {
-  const loginBtn = document.querySelector("button[onclick='Login()']");
+function updateAuthUI() {
+  const authState = store.getState().auth;
+  // Improved selector to catch the button even if there are formatting differences in the HTML
+  const authBtn =
+    document.querySelector("button[onclick*='Login']") ||
+    document.querySelector("button[onclick*='Logout']");
   const navLinks = document.querySelector(".nav-links");
-  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+  let greetElement = document.getElementById("user-greet");
 
-  if (isLoggedIn) {
-    if (loginBtn) {
-      loginBtn.innerText = "Logout";
-      loginBtn.setAttribute("onclick", "Logout()");
+  if (authState.isLoggedIn) {
+    if (authBtn) {
+      authBtn.innerText = "Logout";
+      authBtn.setAttribute("onclick", "Logout()");
     }
-    if (!document.getElementById("user-greet")) {
-      navLinks.insertAdjacentHTML(
-        "beforeend",
-        '<span id="user-greet" style="margin-left:15px; color:#ff4d4d; font-weight:bold;">Hi, Admin</span>',
-      );
+    const firstName = authState.user.username.split(" ")[0];
+
+    if (!greetElement) {
+      // FIX: Added a check to ensure navLinks actually exists in the HTML before inserting
+      if (navLinks) {
+        navLinks.insertAdjacentHTML(
+          "beforeend",
+          `<span id="user-greet" style="margin-left:15px; color:#ff4d4d; font-weight:bold;">Hi, ${firstName}</span>`,
+        );
+      }
+    } else {
+      greetElement.innerText = `Hi, ${firstName}`;
     }
   } else {
-    if (loginBtn) {
-      loginBtn.innerText = "Login / Register";
-      loginBtn.setAttribute("onclick", "Login()");
+    if (authBtn) {
+      authBtn.innerText = "Login / Register";
+      authBtn.setAttribute("onclick", "Login()");
     }
-    const greet = document.getElementById("user-greet");
-    if (greet) greet.remove();
+    if (greetElement) greetElement.remove();
   }
 }
 
+// ==========================================
+// 4. CART & WISHLIST UI DISPATCHERS
+// ==========================================
+function toggleCart() {
+  document.getElementById("cart-sidebar")?.classList.toggle("open");
+}
+function toggleWishlistSidebar() {
+  document.getElementById("wishlist-sidebar")?.classList.toggle("open");
+}
+
+function addToCart(name, state, price) {
+  const bookingDate = new Date().toLocaleDateString("en-IN");
+  const itemPrice = parseInt(String(price).replace(/[₹,]/g, ""));
+  store.dispatch(
+    cartSlice.actions.addItem({
+      name,
+      state,
+      price: itemPrice,
+      date: bookingDate,
+    }),
+  );
+  if (!document.getElementById("cart-sidebar").classList.contains("open"))
+    toggleCart();
+}
+
+function removeFromCart(index) {
+  store.dispatch(cartSlice.actions.removeItem(index));
+}
+
+function toggleWishlistItem(name, state, price, image) {
+  const itemPrice =
+    typeof price === "string" ? parseInt(price.replace(/[₹,]/g, "")) : price;
+  store.dispatch(
+    wishlistSlice.actions.toggleItem({ name, state, price: itemPrice, image }),
+  );
+}
+
 function checkout() {
-  if (cart.length === 0) return alert("Your cart is empty!");
-  alert("Thank You! your " + cart.length + " destinations has been booked!");
-  cart = [];
-  saveAndRefresh();
+  const state = store.getState();
+  if (!state.auth.isLoggedIn)
+    return alert("Please log in to checkout your cart!");
+  if (state.cart.length === 0) return alert("Your cart is empty!");
+  alert(
+    `Thank You, ${state.auth.user.username}! Your ${state.cart.length} destinations have been booked!`,
+  );
+  store.dispatch(cartSlice.actions.clearCart());
   toggleCart();
 }
 
+function updateCartUI() {
+  const cartState = store.getState().cart;
+  const cartCount = document.getElementById("cart-count");
+  const cartItems = document.getElementById("cart-items");
+  const cartTotal = document.getElementById("cart-total");
+
+  if (cartCount) cartCount.innerText = cartState.length;
+
+  if (cartState.length === 0 && cartItems) {
+    cartItems.innerHTML =
+      '<p class="empty-msg" style="text-align:center; padding:20px;">No destinations added yet.</p>';
+    if (cartTotal) cartTotal.innerText = "₹0";
+    return;
+  }
+
+  let total = 0;
+  if (cartItems) {
+    cartItems.innerHTML = cartState
+      .map((item, index) => {
+        total += item.price;
+        return `
+      <div class="cart-item" style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #eee;">
+        <div>
+          <p style="font-weight:bold; margin:0;">${item.name}</p>
+          <p style="font-size:12px; color:#666; margin:0;">${item.state}</p>
+          <p style="color:#ff4d00; font-weight:bold; margin:0;">₹${item.price.toLocaleString("en-IN")}</p>
+        </div>
+        <span class="material-icons-outlined" style="cursor:pointer; color:red;" onclick="removeFromCart(${index})">delete</span>
+      </div>`;
+      })
+      .join("");
+  }
+  if (cartTotal) cartTotal.innerText = "₹" + total.toLocaleString("en-IN");
+}
+
+function updateWishlistUI() {
+  const wishlistState = store.getState().wishlist;
+  const wishlistCount = document.getElementById("wishlist-count");
+  const wishlistItems = document.getElementById("wishlist-items");
+
+  if (wishlistCount) wishlistCount.innerText = wishlistState.length;
+
+  if (wishlistState.length === 0 && wishlistItems) {
+    wishlistItems.innerHTML =
+      '<p class="empty-msg" style="text-align:center; padding:20px;">Your wishlist is empty.</p>';
+    return;
+  }
+
+  if (wishlistItems) {
+    wishlistItems.innerHTML = wishlistState
+      .map(
+        (item) => `
+      <div class="cart-item" style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #eee;">
+        <div>
+          <p style="font-weight:bold; margin:0;">${item.name}</p>
+          <p style="font-size:12px; color:#666; margin:0;">${item.state}</p>
+        </div>
+        <div>
+          <span class="material-icons-outlined" style="cursor:pointer; color:var(--primary-color); margin-right:10px" onclick="addToCart('${item.name}', '${item.state}', '${item.price}')">add_shopping_cart</span>
+          <span class="material-icons-outlined" style="cursor:pointer; color:#e91e63;" onclick="toggleWishlistItem('${item.name}')">favorite</span>
+        </div>
+      </div>
+    `,
+      )
+      .join("");
+  }
+}
+
+// ==========================================
+// 5. PACKAGE RENDERING & INIT
+// ==========================================
+const mockPackages = [
+  {
+    name: "Mumbai",
+    state: "Maharashtra",
+    desc: "The City of Dreams and Bollywood.",
+    price: "₹15,000",
+    image: "asset/Mumbai.jpg",
+  },
+  {
+    name: "New Delhi",
+    state: "Delhi NCR",
+    desc: "Historic capital with Mughal architecture.",
+    price: "₹12,000",
+    image: "asset/Delhi1.jpg",
+  },
+  {
+    name: "Bengaluru",
+    state: "Karnataka",
+    desc: "The Garden City and tech hub.",
+    price: "₹14,000",
+    image: "asset/Bengaluru.jpg",
+  },
+  {
+    name: "Varanasi",
+    state: "Uttar Pradesh",
+    desc: "Spiritual capital on the Ganga.",
+    price: "₹10,000",
+    image: "asset/varanasi.jpg",
+  },
+  {
+    name: "Rishikesh",
+    state: "Uttarakhand",
+    desc: "The Yoga Capital of the World.",
+    price: "₹8,000",
+    image: "asset/Rishikesh1.webp",
+  },
+  {
+    name: "Manali",
+    state: "Himachal Pradesh",
+    desc: "Snow-capped mountains and adventure.",
+    price: "₹11,000",
+    image: "asset/Manali.jpg",
+  },
+  {
+    name: "Puri",
+    state: "Odisha",
+    desc: "Jagannath Temple and Golden Beach.",
+    price: "₹9,000",
+    image: "asset/Puri.jpg",
+  },
+  {
+    name: "Tirupati",
+    state: "Andhra Pradesh",
+    desc: "Home to the revered Venkateswara Temple.",
+    price: "₹7,000",
+    image: "asset/tirupati.jpg",
+  },
+];
+
+async function fetchPackages() {
+  try {
+    const response = await fetch(`${API_URL}/packages`);
+    if (!response.ok) throw new Error();
+    window.currentPackages = await response.json();
+  } catch (error) {
+    window.currentPackages = mockPackages;
+  }
+  renderPackages(window.currentPackages);
+}
+
+function renderPackages(packages) {
+  if (!packages || packages.length === 0) return;
+  const grid1 = document.getElementById("grid-1");
+  const grid2 = document.getElementById("grid-2");
+  if (!grid1 || !grid2) return;
+
+  const wishlistState = store.getState().wishlist;
+
+  const createCard = (pkg) => {
+    const isWishlisted = wishlistState.some((item) => item.name === pkg.name);
+    const heartClass = isWishlisted ? "active" : "";
+    const iconName = isWishlisted ? "favorite" : "favorite_border";
+
+    return `
+      <div class="city-card">
+        <div class="wishlist-btn ${heartClass}" onclick="toggleWishlistItem('${pkg.name}', '${pkg.state}', '${pkg.price}', '${pkg.image}')">
+          <span class="material-icons-outlined">${iconName}</span>
+        </div>
+        <img src="${pkg.image}" alt="${pkg.name}" onerror="this.src='https://via.placeholder.com/300x200?text=${pkg.name}'">
+        <div class="card-body">
+          <h4>${pkg.name}</h4>
+          <p class="state">${pkg.state}</p>
+          <p class="desc">${pkg.desc}</p>
+          <a class="explore-link" onclick="addToCart('${pkg.name}', '${pkg.state}', '${pkg.price}')">
+            Book Trip <span class="material-icons-outlined">add_shopping_cart</span>
+          </a>
+        </div>
+      </div>
+    `;
+  };
+
+  grid1.innerHTML = packages.slice(0, 4).map(createCard).join("");
+  grid2.innerHTML = packages.slice(4, 8).map(createCard).join("");
+}
+
 window.onload = () => {
-  console.log("Window Loaded! Initializing Darshan Travels...");
-  updateCartUI(); // Cart render
-  checkAuthStatus(); // Login
-  fetchPackages(); // API
+  updateCartUI();
+  updateWishlistUI();
+  updateAuthUI();
+  fetchPackages();
 };
+
+// ==========================================
+// 6. FIX: BIND FUNCTIONS TO WINDOW OBJECT
+// ==========================================
+// If this script is loaded as a module, inline HTML 'onclick' tags will fail
+// because they can't find these functions. This explicitly makes them globally available.
+window.Login = Login;
+window.Logout = Logout;
+window.toggleCart = toggleCart;
+window.toggleWishlistSidebar = toggleWishlistSidebar;
+window.addToCart = addToCart;
+window.removeFromCart = removeFromCart;
+window.toggleWishlistItem = toggleWishlistItem;
+window.checkout = checkout;
