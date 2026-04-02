@@ -226,7 +226,13 @@
       </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/@reduxjs/toolkit@2/dist/redux-toolkit.umd.min.js"></script>
-    <script src="script.js"></script>
+    <script type="importmap">
+      {
+        "imports": {
+          "@reduxjs/toolkit": "https://esm.sh/@reduxjs/toolkit"
+        }
+      }
+    </script>
+    <script type="module" src="script.js"></script>
   </body>
 </html>

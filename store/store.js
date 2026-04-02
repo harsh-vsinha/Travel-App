@@ -1,12 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
-import cartSlice from "../slice/cartSlice";
-import authSlice from "../slice/authSlice";
+import cartReducer from "../slice/cartSlice.js";
+import authReducer from "../slice/authSlice.js";
+import wishlistReducer from "../slice/whishlist.js";
 // --- Configure Store ---
 const store = configureStore({
   reducer: {
-    cart: cartSlice.reducer,
-    wishlist: wishlistSlice.reducer,
-    auth: authSlice.reducer,
+    cart: cartReducer,
+    wishlist: wishlistReducer,
+    auth: authReducer,
   },
 });
 

@@ -1,4 +1,14 @@
 import { createSlice } from "@reduxjs/toolkit";
+
+const loadState = (key, fallback) => {
+  try {
+    const serializedState = localStorage.getItem(key);
+    return serializedState ? JSON.parse(serializedState) : fallback;
+  } catch (err) {
+    return fallback;
+  }
+};
+
 // --- Wishlist Slice ---
 const wishlistSlice = createSlice({
   name: "wishlist",
@@ -17,4 +27,5 @@ const wishlistSlice = createSlice({
   },
 });
 
-export const { toggleItem } = whishlistSlice.action;
+export const { toggleItem } = wishlistSlice.actions;
+export default wishlistSlice.reducer;

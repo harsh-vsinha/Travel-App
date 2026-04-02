@@ -1,4 +1,14 @@
 import { createSlice } from "@reduxjs/toolkit";
+
+const loadState = (key, fallback) => {
+  try {
+    const serializedState = localStorage.getItem(key);
+    return serializedState ? JSON.parse(serializedState) : fallback;
+  } catch (err) {
+    return fallback;
+  }
+};
+
 // --- Auth Slice ---
 const authSlice = createSlice({
   name: "auth",
@@ -16,3 +26,4 @@ const authSlice = createSlice({
 });
 
 export const { login, logout } = authSlice.actions;
+export default authSlice.reducer;

@@ -1,44 +1,11 @@
 const API_URL = "http://localhost:3000";
-import store from "./slice/cartSlice.js"; // <-- Adjust this path to where your store is created
-import { addItem } from "./cartSlice.js";
+import store from "./store/store.js";
+import { addItem, removeItem, clearCart } from "./slice/cartSlice.js";
+import { login, logout } from "./slice/authSlice.js";
+import { toggleItem } from "./slice/whishlist.js";
 
 // ==========================================
-// 1. REDUX TOOLKIT SETUP
-// ==========================================
-if (!window.RTK) {
-  console.error("Redux Toolkit CDN is missing in index.html!");
-}
-
-const { configureStore, createSlice } = window.RTK;
-
-const loadState = (key, fallback) => {
-  try {
-    const serializedState = localStorage.getItem(key);
-    return serializedState ? JSON.parse(serializedState) : fallback;
-  } catch (err) {
-    return fallback;
-  }
-};
-
-const wishlistSlice = createSlice({
-  name: "wishlist",
-  initialState: loadState("darshan_wishlist", []),
-  reducers: {
-    toggleItem: (state, action) => {
-      const existingIndex = state.findIndex(
-        (item) => item.name === action.payload.name,
-      );
-      if (existingIndex >= 0) {
-        state.splice(existingIndex, 1);
-      } else {
-        state.push(action.payload);
-      }
-    },
-  },
-});
-
-// ==========================================
-// 2. PERSISTENCE & SUBSCRIPTION
+//  PERSISTENCE
 // ==========================================
 store.subscribe(() => {
   const state = store.getState();
@@ -55,17 +22,14 @@ store.subscribe(() => {
 });
 
 // ==========================================
-// 3. AUTHENTICATION UI
+//  AUTHENTICATION UI
 // ==========================================
 function Login() {
-  // Added .trim() to make the prompt more forgiving of accidental spaces
   const user = prompt("Username:")?.trim();
   const pass = prompt("Password:")?.trim();
 
   if (user === "Admin Traveler" && pass === "12345678") {
-    store.dispatch(
-      authSlice.actions.login({ username: "Admin Traveler", role: "admin" }),
-    );
+    store.dispatch(login({ username: "Admin Traveler", role: "admin" }));
     alert("Login Successful!");
   } else {
     alert("Invalid Credentials.");
@@ -73,13 +37,12 @@ function Login() {
 }
 
 function Logout() {
-  store.dispatch(authSlice.actions.logout());
+  store.dispatch(logout());
   alert("Logged out successfully.");
 }
 
 function updateAuthUI() {
   const authState = store.getState().auth;
-  // Improved selector to catch the button even if there are formatting differences in the HTML
   const authBtn =
     document.querySelector("button[onclick*='Login']") ||
     document.querySelector("button[onclick*='Logout']");
@@ -94,7 +57,6 @@ function updateAuthUI() {
     const firstName = authState.user.username.split(" ")[0];
 
     if (!greetElement) {
-      // FIX: Added a check to ensure navLinks actually exists in the HTML before inserting
       if (navLinks) {
         navLinks.insertAdjacentHTML(
           "beforeend",
@@ -114,7 +76,7 @@ function updateAuthUI() {
 }
 
 // ==========================================
-// 4. CART & WISHLIST UI DISPATCHERS
+// CART & WISHLIST UI DISPATCHERS
 // ==========================================
 function toggleCart() {
   document.getElementById("cart-sidebar")?.classList.toggle("open");
@@ -127,7 +89,7 @@ function addToCart(name, state, price) {
   const bookingDate = new Date().toLocaleDateString("en-IN");
   const itemPrice = parseInt(String(price).replace(/[₹,]/g, ""));
   store.dispatch(
-    cartSlice.actions.addItem({
+    addItem({
       name,
       state,
       price: itemPrice,
@@ -139,15 +101,13 @@ function addToCart(name, state, price) {
 }
 
 function removeFromCart(index) {
-  store.dispatch(cartSlice.actions.removeItem(index));
+  store.dispatch(removeItem(index));
 }
 
 function toggleWishlistItem(name, state, price, image) {
   const itemPrice =
     typeof price === "string" ? parseInt(price.replace(/[₹,]/g, "")) : price;
-  store.dispatch(
-    wishlistSlice.actions.toggleItem({ name, state, price: itemPrice, image }),
-  );
+  store.dispatch(toggleItem({ name, state, price: itemPrice, image }));
 }
 
 function checkout() {
@@ -158,7 +118,7 @@ function checkout() {
   alert(
     `Thank You, ${state.auth.user.username}! Your ${state.cart.length} destinations have been booked!`,
   );
-  store.dispatch(cartSlice.actions.clearCart());
+  store.dispatch(clearCart());
   toggleCart();
 }
 
@@ -231,7 +191,7 @@ function updateWishlistUI() {
 }
 
 // ==========================================
-// 5. PACKAGE RENDERING & INIT
+// PACKAGE RENDERING & INIT
 // ==========================================
 const mockPackages = [
   {
@@ -293,13 +253,7 @@ const mockPackages = [
 ];
 
 async function fetchPackages() {
-  try {
-    const response = await fetch(`${API_URL}/packages`);
-    if (!response.ok) throw new Error();
-    window.currentPackages = await response.json();
-  } catch (error) {
-    window.currentPackages = mockPackages;
-  }
+  window.currentPackages = mockPackages;
   renderPackages(window.currentPackages);
 }
 
@@ -346,7 +300,7 @@ window.onload = () => {
 };
 
 // ==========================================
-// 6. FIX: BIND FUNCTIONS TO WINDOW OBJECT
+// FIX: BIND FUNCTIONS TO WINDOW OBJECT
 // ==========================================
 // If this script is loaded as a module, inline HTML 'onclick' tags will fail
 // because they can't find these functions. This explicitly makes them globally available.
